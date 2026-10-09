@@ -1,14 +1,9 @@
-name = "insight/physics-lattice-diffusion"
-category = "Science"
-sub_category = "Physics"
-difficulty = "medium"
-draft = false
-
-agent_timeout = 28800
-verifier_timeout = 18000
-
-[environment]
-notes = "Uses global/system-wide dependencies"
+[task]
+title = "Physics Lattice Diffusion"
+description = "Implement and verify diffusion models on physical lattices."
+difficulty = "hard"
+category = "science-physics"
+author = "Sadaf Mughees"
 
 [verifier]
 timeout = 18000
