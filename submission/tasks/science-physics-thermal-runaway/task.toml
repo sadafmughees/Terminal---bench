@@ -1,0 +1,15 @@
+name = "insight/physics-lattice-diffusion"
+category = "Science"
+sub_category = "Physics"
+difficulty = "medium"
+draft = false
+
+agent_timeout = 28800
+verifier_timeout = 18000
+
+[environment]
+notes = "Uses global/system-wide dependencies"
+
+[verifier]
+timeout = 18000
+environment_mode = "shared"
