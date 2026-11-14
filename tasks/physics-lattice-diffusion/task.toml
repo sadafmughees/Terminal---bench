@@ -1,0 +1,53 @@
+artifacts = ["/app/solution_metrics.json"]
+schema_version = "2.0"
+
+[task]
+name = "insight/physics-lattice-diffusion"
+description = "Solve 2D nonlinear steady-state lattice heat conduction with temperature-dependent thermal conductivity, radiative cooling, and exponential volumetric heating; locate the thermal runaway fold bifurcation, compute the linear stability eigenvalue, and verify second-order spatial convergence via MMS using JAX."
+
+[metadata]
+difficulty_explanation = """
+This problem models nonlinear thermal runaway (Frank-Kamenetskii fold bifurcation) in a 2D crystalline silicon micro-heater lattice with temperature-dependent phononic thermal conductivity k(T) = k0 / (1 + alpha*(T - T0)), Stefan-Boltzmann T^4 radiative cooling at the top boundary, isothermal bottom sink, and exponential volumetric self-heating. Standard fixed-parameter Newton-Raphson fails near the turning point because the Jacobian becomes singular at the fold bifurcation (Q_crit, T_crit). Solving this reliably requires cell-centered finite-volume discretization with harmonic-mean face conductivities, automatic differentiation via JAX for exact derivatives and MMS source terms, pseudo-arclength continuation around the saddle-node turning point, and shift-invert Arnoldi spectral analysis of the linearized transient operator (1/(rho*c)) dR/dT.
+"""
+
+solution_explanation = """
+Formulate the 2D cell-centered finite-volume residual R(T, Q0) using JAX with 64-bit precision enabled (jax_enable_x64), computing exact analytical derivatives of the harmonic-mean face fluxes, nonlinear boundary terms, and MMS source terms via JAX autodiff. Trace the lower steady-state equilibrium branch from Q0 = 0 past the turning point using a predictor-corrector pseudo-arclength continuation scheme in (T, Q0) space, and fit a local quadratic q(T_max) around the peak source amplitude to extract (Q_crit, T_crit). Refine the lower-branch state at the target Q0 via damped Newton iterations, extract the rightmost real eigenvalue S of A = (1/(rho*c)) dR/dT via shift-invert Arnoldi iteration, and verify second-order finite-volume accuracy across N = 25, 50, 100 grids using the Method of Manufactured Solutions.
+"""
+
+verification_explanation = """
+The verifier checks /app/solution_metrics.json against an independent reference solver across six tests: (1) schema and finiteness of T_field, Q_crit, T_crit, S, and mms_slope; (2) relative L2 error <= 1e-3 and peak temperature rise error <= 1e-3 on the 100x100 T_field; (3) critical source Q_crit within 1.5% relative tolerance; (4) critical peak temperature rise (T_crit - T0) within 2.0% relative tolerance; (5) negative linear stability index S < 0 within 2.0% relative tolerance; and (6) MMS convergence slope within 0.15 of 2.0. It also invokes /app/solve_lattice.py via CLI across three held-out (alpha, gamma, q0) parameter sets and verifies T_field and S on each.
+"""
+
+category = "Science"
+subcategory = "Physics"
+tags = [
+  "heat-conduction",
+  "nonlinear-pde",
+  "bifurcation-analysis",
+  "thermal-runaway",
+  "finite-volume",
+  "jax",
+  "method-of-manufactured-solutions",
+]
+expert_time_estimate_hours = 12
+relevant_experience = "Computational physicist or applied mathematician experienced in nonlinear PDEs, finite-volume discretization, numerical continuation and bifurcation analysis (pseudo-arclength methods), linear stability eigenvalue problems, and automatic differentiation in JAX."
+
+[verifier]
+network_mode = "no-network"
+timeout_sec = 600.0
+environment_mode = "shared"
+
+[verifier.environment]
+network_mode = "no-network"
+
+[agent]
+network_mode = "no-network"
+timeout_sec = 3600.0
+
+[environment]
+network_mode = "no-network"
+build_timeout_sec = 900.0
+cpus = 2
+memory_mb = 4096
+storage_mb = 8192
+gpus = 0
