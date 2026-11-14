@@ -1,5 +1,10 @@
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir numpy==1.26.4 scipy==1.11.4
+RUN pip install --no-cache-dir \
+    numpy==2.5.3 \
+    scipy==1.18.1 \
+    jax==0.12.0.1 \
+    jaxlib==0.12.0.1 \
+    pytest==9.1.1
